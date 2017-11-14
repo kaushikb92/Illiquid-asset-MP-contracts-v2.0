@@ -15,12 +15,12 @@ contract REAssets{
     
     newREAssetRequest[] public allNewREAssetRequests;
 
-    mapping (bytes32=>uint256) mapMarketPriceWithRE;
+    mapping (bytes32=>mapping(address=>uint256)) mapOfferPriceWithRE;
     mapping (bytes32=>mapping(address=>uint256)) mapAquisitionPrice;
     mapping (bytes32=>address) mapREAssetsWithAddress;
     mapping (bytes32=>bool) public newREAssetRequestStatus;
     mapping (bytes32=>newREAssetRequest) REAssetRequestsByAssetId;
-    
+        
     struct REAssetsByUser{
         bytes32[] assetId;
     }
@@ -29,7 +29,7 @@ contract REAssets{
 
     uint i;
 
-    function addNewAssetRequest(bytes32 _assetSubType, bytes32 _assetName, bytes32 _add1, bytes32 _lat, bytes32 _long, address _requestRaiser, uint256 _aquisitionPrice, uint256 _marketPrice, bytes32 _assetID) returns (bool _status){
+    function addNewREAssetRequest(address _requestRaiser,bytes32 _assetSubType, bytes32 _assetName, bytes32 _add1, bytes32 _lat, bytes32 _long,bytes32 _assetID) returns (bool _status){
 
         newREAssetRequest memory newRequest;
         newRequest.assetName = _assetName;
@@ -41,8 +41,6 @@ contract REAssets{
         newRequest.timestamp = block.timestamp;
         allNewREAssetRequests.push(newRequest);
 
-        mapMarketPriceWithRE[_assetID] = _marketPrice;
-        mapAquisitionPrice[_assetID][_requestRaiser] = _aquisitionPrice;
         newREAssetRequestStatus[_assetID] = false;
         mapREAssetsWithAddress[_assetID] = _requestRaiser; 
         REAssetsByUsers[_requestRaiser].assetId.push(_assetID);
@@ -50,13 +48,47 @@ contract REAssets{
         return true;
     }
 
-    function updateMarketPrice(bytes32 _assetId, uint256 _marketPrice) returns (bool success){
-        mapMarketPriceWithRE[_assetId] = _marketPrice;
+    function addNewREAssetByAdmin( bytes32 _assetName,bytes32 _assetSubType, bytes32 _add1, bytes32 _lat, bytes32 _long,bytes32 _assetID)returns(bool success){
+        newREAssetRequest memory newRequest;
+        newRequest.assetName = _assetName;
+        newRequest.add1 = _add1;
+        newRequest.assetId = _assetID;
+        newRequest.lat = _lat;
+        newRequest.long = _long;
+        newRequest.asseetSubType = _assetSubType;
+        newRequest.timestamp = block.timestamp;
+        allNewREAssetRequests.push(newRequest);
+        REAssetRequestsByAssetId[_assetID] = newRequest;
+    }
+
+    function addNewREAssetByBuyer( address _requestRaiser, uint256 _aquisitionPrice, uint256 _OfferPrice, bytes32 _assetID) returns (bool _success){
+        uint count =0;
+        mapOfferPriceWithRE[_assetID][_requestRaiser] = _OfferPrice;
+        mapAquisitionPrice[_assetID][_requestRaiser] = _aquisitionPrice;
+        bytes32[] memory assetIds = new bytes32[](REAssetsByUsers[_requestRaiser].assetId.length);
+        assetIds = REAssetsByUsers[_requestRaiser].assetId;
+        for(i=0;i<REAssetsByUsers[_requestRaiser].assetId.length;i++){
+            if(_assetID == assetIds[i]){
+                count++;
+            }
+        }
+        if(count==0){
+            mapREAssetsWithAddress[_assetID] = _requestRaiser; 
+            REAssetsByUsers[_requestRaiser].assetId.push(_assetID);
+            return true;
+        }
+        else{
+            return true;
+        }
+    }
+
+    function updateOfferPrice(bytes32 _assetId, address _requestRaiser, uint256 _OfferPrice) returns (bool success){
+        mapOfferPriceWithRE[_assetId][_requestRaiser] = _OfferPrice;
         return true;
     }
 
-    function getMarketPriceForRE(bytes32 _assetId) constant returns(uint256){
-        return (mapMarketPriceWithRE[_assetId]);
+    function getOfferPriceForRE(bytes32 _assetId, address _requestRaiser) constant returns(uint256){
+        return (mapOfferPriceWithRE[_assetId][_requestRaiser]);
     }
 
     function getAquisitionPrice(bytes32 _assetId,address _owner) constant returns(uint256){
@@ -116,6 +148,32 @@ contract REAssets{
                     add1s[i] = currentRequest.add1;
                     asseetSubTypes[i] = currentRequest.asseetSubType;
                     timestamps[i] = currentRequest.timestamp;
+                    assetIds[i] = currentRequest.assetId;
+                    lats[i] = currentRequest.lat;
+                    longs[i] = currentRequest.long;
+                }
+            }
+            return(assetIds,add1s,asseetSubTypes,timestamps,assetNames,lats,longs);
+    }
+
+    function getAllApproavedREAssetDetails() constant returns (bytes32[],bytes32[],bytes32[],bytes32[],bytes32[],bytes32[]){
+        bytes32[] memory assetNames = new bytes32[](allNewREAssetRequests.length);
+        bytes32[] memory add1s = new bytes32[](allNewREAssetRequests.length);
+        bytes32[] memory lats = new bytes32[](allNewREAssetRequests.length);
+        bytes32[] memory longs = new bytes32[](allNewREAssetRequests.length);
+        bytes32[] memory asseetSubTypes = new bytes32[](allNewREAssetRequests.length);
+        bytes32[] memory assetIds = new bytes32[](allNewREAssetRequests.length);
+
+            for (i = 0; i < allNewREAssetRequests.length; i++) {
+
+                newREAssetRequest memory currentRequest;
+                currentRequest = allNewREAssetRequests[i];
+                
+                if(newREAssetRequestStatus[currentRequest.assetId])
+                {
+                    assetNames[i] = currentRequest.assetName;
+                    add1s[i] = currentRequest.add1;
+                    asseetSubTypes[i] = currentRequest.asseetSubType;
                     assetIds[i] = currentRequest.assetId;
                     lats[i] = currentRequest.lat;
                     longs[i] = currentRequest.long;

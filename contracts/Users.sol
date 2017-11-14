@@ -11,6 +11,8 @@ contract Users{
     mapping(address=>bytes32) public UserIDsWithAddress;            //Map user's unique ID with associated wallet address
     mapping(address=>User) public userDetails;                      //Map user details with associated wallet address
     mapping(bytes32=>address) public userlogin;                     //Map user's associated wallet address with unique ID 
+    mapping(bytes32=>bool) public adminLogin;
+
 
     /* Stracture to hold each user's details*/
     struct User{
@@ -38,20 +40,26 @@ contract Users{
         PasswordsWithAddress[_walletAddr] = _userPwd;
         userDetails[_walletAddr] = newRegdUser; 
         userlogin[_userID] = _walletAddr;
+        adminLogin[_userID] = false;
 
         return true; 
     }
 
+    function setAdmin(bytes32 _adminID,address _walletAddress,bytes32 _password) returns (bool _success){
+        UserIDsWithAddress[_walletAddress] = _adminID;
+        PasswordsWithAddress[_walletAddress] = _password;
+        userlogin[_adminID] = _walletAddress;
+        adminLogin[_adminID] = true;
+        return true;
+    }
+
     function getAdminLogin(bytes32 _userID,bytes32 _userPwd) constant returns (bool _status){
-        if (_userID == "ADMIN123") {
-            if (_userPwd == "12345" ){
-                return true;
-            }
+        if (adminLogin[_userID]) {
+        return true;
         }
         else{
             return false;
         }
-        return false;
     }
 
     /* Function to query user details with associated wallet address*/

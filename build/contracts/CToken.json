@@ -1,0 +1,232 @@
+{
+  "contract_name": "CToken",
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_holder",
+          "type": "address"
+        }
+      ],
+      "name": "getCTBalance",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "balanceOfCT",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_from",
+          "type": "address"
+        },
+        {
+          "name": "_to",
+          "type": "address"
+        },
+        {
+          "name": "_value",
+          "type": "uint256"
+        }
+      ],
+      "name": "CTtransferFrom",
+      "outputs": [
+        {
+          "name": "success",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_owner",
+          "type": "address"
+        },
+        {
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "setCTokenBalance",
+      "outputs": [
+        {
+          "name": "success",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "CTOwner",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "",
+          "type": "address"
+        },
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "allowanceOfCT",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_owner",
+          "type": "address"
+        }
+      ],
+      "name": "resetCTokenBalance",
+      "outputs": [
+        {
+          "name": "success",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "payable": false,
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "value",
+          "type": "uint256"
+        }
+      ],
+      "name": "currencyTransfer",
+      "type": "event"
+    }
+  ],
+  "unlinked_binary": "0x606060405234610000575b60008054600160a060020a03191633600160a060020a03161790555b5b61035c806100366000396000f300606060405236156100675763ffffffff60e060020a600035041663240d6b6b811461006c57806350111daa14610097578063badeb944146100c2578063c666b080146100f8578063d5ce6d6914610128578063dd20a98614610151578063ee4be02c14610182575b610000565b3461000057610085600160a060020a03600435166101af565b60408051918252519081900360200190f35b3461000057610085600160a060020a03600435166101d0565b60408051918252519081900360200190f35b34610000576100e4600160a060020a03600435811690602435166044356101e2565b604080519115158252519081900360200190f35b34610000576100e4600160a060020a03600435166024356102b8565b604080519115158252519081900360200190f35b34610000576101356102e0565b60408051600160a060020a039092168252519081900360200190f35b3461000057610085600160a060020a03600435811690602435166102ef565b60408051918252519081900360200190f35b34610000576100e4600160a060020a036004351661030c565b604080519115158252519081900360200190f35b600160a060020a038116600090815260016020526040902054805b50919050565b60016020526000908152604090205481565b6000600160a060020a03831615156101f957610000565b600160a060020a0384166000908152600160205260409020548290101561021f57610000565b600160a060020a038316600090815260016020526040902054828101101561024657610000565b600160a060020a03808516600081815260016020908152604080832080548890039055938716808352918490208054870190558351868152935191937ff5ca2cac7d01d9b05d6a1d7c7ad8e206b4a68fcdc340ccf5cd15b58b611dccd8929081900390910190a35060015b9392505050565b600160a060020a03821660009081526001602081905260409091208054830190555b92915050565b600054600160a060020a031681565b600260209081526000928352604080842090915290825290205481565b600160a060020a03811660009081526001602081905260408220919091555b9190505600a165627a7a723058200da9db3c7b34ef3220f59cdb146f662dad7252ab124258edbbb410cd81c9f4c70029",
+  "networks": {
+    "1510552645606": {
+      "events": {
+        "0xf5ca2cac7d01d9b05d6a1d7c7ad8e206b4a68fcdc340ccf5cd15b58b611dccd8": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "from",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "to",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "value",
+              "type": "uint256"
+            }
+          ],
+          "name": "currencyTransfer",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x26e49f358597817cc3f4219e60c8c8b96d32ed87",
+      "updated_at": 1510552942004
+    },
+    "1510553469623": {
+      "events": {
+        "0xf5ca2cac7d01d9b05d6a1d7c7ad8e206b4a68fcdc340ccf5cd15b58b611dccd8": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "from",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "to",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "value",
+              "type": "uint256"
+            }
+          ],
+          "name": "currencyTransfer",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x300f22a0397afcdb66c354b930dbc066f1593ad8",
+      "updated_at": 1510553544488
+    }
+  },
+  "schema_version": "0.0.5",
+  "updated_at": 1510553544488
+}

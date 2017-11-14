@@ -19,6 +19,8 @@ contract AssetRegister{
     mapping(bytes32=> uint256) public marketPricePerAssetId;
 
     mapping(address=> mapping(bytes32=>bool)) public assetVisibility;
+
+    mapping (bytes32=>bytes32) public customAssetDescription;
    
     /* Stracture to hold traded assets ids*/
     struct assetByOwner{
@@ -35,10 +37,20 @@ contract AssetRegister{
         bytes32 assetSubType;
         bytes32 assetID;
         uint timestamp;
+        bytes32 cmpnyName;
+    }
+
+    function addCustomAssetDescription(bytes32 _description,bytes32 _assetID) returns (bool success){
+        customREAssetDescription[_assetID] = _description;
+        return true;
+    }
+
+    function getCustomAssetDescription(bytes32 _assetID) returns (bytes32){
+        return customREAssetDescription[_assetID];
     }
 
     /* Function to register a new asset*/
-    function addNewAsset(bytes32 _assetName, bytes32 _assetType, bytes32 _assetSubType, bytes32 _assetID) returns (bool addAsset_Status){
+    function addNewAsset(bytes32 _assetName, bytes32 _assetType, bytes32 _assetSubType, bytes32 _assetID, ) returns (bool addAsset_Status){
 
         assetDetails memory newRegdAsset;
         newRegdAsset.assetName = _assetName;
@@ -63,7 +75,7 @@ contract AssetRegister{
         return (assetDetailsByAssetType[_assetType].AID);
     }
 
-    function getAllAssetDetails(bytes32 _assetID) constant returns(bytes32[],uint[],bytes32[],bytes32[],bytes32[]){
+    function getAllAssetDetails() constant returns(bytes32[],uint[],bytes32[],bytes32[],bytes32[]){
         uint length = Assets.length;
         bytes32[] memory assetIDs = new bytes32[](length);
         bytes32[] memory assetNames = new bytes32[](length);

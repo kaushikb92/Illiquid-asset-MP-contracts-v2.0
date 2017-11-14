@@ -15,9 +15,10 @@ contract AssetTypes{
 
     mapping(bytes32=>assetIds) mapAssetIdsWithSubTypes;
 
-    function addNewAssetSubType(bytes32 _typeName,bytes32 _subTypeName,uint _timestamp) returns (bool success){
+    function addNewAssetSubType(bytes32 _typeName,bytes32 _subTypeName,uint _timestamp,bytes32 _assetId) returns (bool success){
         mapSubTypes[_typeName].subTypeName.push(_subTypeName);  
         mapSubTypesWithTimestamps[_subTypeName] = _timestamp;
+        addAssetIdsPerSubTypes(_subTypeName,_assetId);
 
         return true;
     }

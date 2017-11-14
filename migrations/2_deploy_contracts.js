@@ -8,6 +8,7 @@ var REAssets = artifacts.require("./REAssets.sol");
 var RegReceipts = artifacts.require("./RegReceipts.sol");
 var TxRegister = artifacts.require("./TxRegister.sol");
 var Users = artifacts.require("./Users.sol");
+var AssetTypes = artifacts.require("./AssetTypes.sol");
 
 
 module.exports = function(deployer) {
@@ -22,4 +23,5 @@ module.exports = function(deployer) {
   deployer.deploy(RegReceipts);
   deployer.deploy(TxRegister);
   deployer.deploy(Users);
+  deployer.deploy(AssetTypes);
 };
