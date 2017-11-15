@@ -9,8 +9,9 @@ contract AssetToken is AssetRegister{
    /* This creates an array with asset balances to asset ids and wallet address */
     mapping(bytes32=>mapping(address=>uint256)) public balanceATOfUsers;
     mapping(bytes32=>mapping(address=>uint256)) public aquisitionPriceOfUsers;
-    mapping(bytes32=>uint256) public highAcqPricePerAsset;
-    mapping(bytes32=>uint256) public lowAcqPricePerAsset;
+    mapping(bytes32=>mapping(address=>uint256)) public offerPriceOfUsers;
+    mapping(bytes32=>uint256) public highOfferPricePerAsset;
+    mapping(bytes32=>uint256) public lowOfferPricePerAsset;
 
     /* This generates a public event on the blockchain that will notify clients */
     event assetTransfer(address indexed from, address indexed to, uint256 value, bytes32 assetName);
@@ -29,58 +30,61 @@ contract AssetToken is AssetRegister{
     uint i;
 
     /* Function to mint tokens as per the registered asset's details with the seller's wallet address*/
-    function setAssetToken(address _assetOwner, bytes32 _assetID, uint256 _tokensToMint, uint256 _aquisitionPrice) returns (bool success){
+    function setAssetToken(address _assetOwner, bytes32 _assetID, uint256 _tokensToMint, uint256 _aquisitionPrice, uint256 _offerPrice) returns (bool success){
         balanceATOfUsers[_assetID][_assetOwner] = _tokensToMint;
         aquisitionPriceOfUsers[_assetID][_assetOwner] = _aquisitionPrice;
         AssetRegister.addAssetWithWalletInReg(_assetOwner,_assetID);
         mapAssetholders[_assetID].holders.push(_assetOwner);
+        offerPriceOfUsers[_assetID][_assetOwner] = _offerPrice;
 
-        bool a = setHighAcqPrice(_assetID, _aquisitionPrice);
-        bool b = setLowAcqPrice(_assetID, _aquisitionPrice);
+        bool a = setHighAcqPrice(_assetID, _offerPrice);
+        bool b = setLowAcqPrice(_assetID, _offerPrice);
         //AssetRegister.enableVisibility(_to,_assetID);
         
-        // else if (lowAcqPricePerAsset[_assetID] >= _aquisitionPrice){lowAcqPricePerAsset[_assetID] = _aquisitionPrice;}
+        // else if (lowOfferPricePerAsset[_assetID] >= _aquisitionPrice){lowOfferPricePerAsset[_assetID] = _aquisitionPrice;}
         
         return true;
     }
 
-    function setHighAcqPrice(bytes32 _assetID, uint256 _aquisitionPrice) returns (bool _success){
-        if (highAcqPricePerAsset[_assetID] <= _aquisitionPrice ){
-            highAcqPricePerAsset[_assetID] = _aquisitionPrice;
+    function setHighAcqPrice(bytes32 _assetID, uint256 _offerPrice) returns (bool _success){
+        if (highOfferPricePerAsset[_assetID] <= _offerPrice ){
+            highOfferPricePerAsset[_assetID] = _offerPrice;
             }
     }
 
-    function setLowAcqPrice(bytes32 _assetID, uint256 _aquisitionPrice) returns (bool _success){
-        if (lowAcqPricePerAsset[_assetID] == 0){
-            lowAcqPricePerAsset[_assetID] = _aquisitionPrice;
+    function setLowAcqPrice(bytes32 _assetID, uint256 _offerPrice) returns (bool _success){
+        if (lowOfferPricePerAsset[_assetID] == 0){
+            lowOfferPricePerAsset[_assetID] = _offerPrice;
         }
         
-        else if (lowAcqPricePerAsset[_assetID] >= _aquisitionPrice ){
-            lowAcqPricePerAsset[_assetID] = _aquisitionPrice;
+        else if (lowOfferPricePerAsset[_assetID] >= _offerPrice ){
+            lowOfferPricePerAsset[_assetID] = _offerPrice;
             }
     }
 
-    function getHighAndLow(bytes32 _assetID) constant returns(uint256, uint256){
-        return (highAcqPricePerAsset[_assetID],lowAcqPricePerAsset[_assetID]);
+    function getHighAndLowOfferPrice(bytes32 _assetID) constant returns(uint256, uint256){
+        return (highOfferPricePerAsset[_assetID],lowOfferPricePerAsset[_assetID]);
     }
 
     function getAssetHolders(bytes32 _assetId) constant returns(address[]){
         return (mapAssetholders[_assetId].holders);
     }
 
-    function  getAssetHoldersAndDetails(bytes32 _assetID) constant returns(address[],uint256[],uint256[]){
+    function getAssetHoldersAndDetails(bytes32 _assetID) constant returns(address[],uint256[],uint256[],uint256[]){
         uint length = mapAssetholders[_assetID].holders.length;
         address[] memory holderAddresses = new address[](length);
         uint256[] memory aquisitionPrices = new uint256[](length);
         uint256[] memory ownedQuantities = new uint256[](length);
+        uint256[] memory offerPrices = new uint256[](length);
         holderAddresses = mapAssetholders[_assetID].holders;
 
         for (i=0;i<length;i++) {
             address holder = holderAddresses[i];
             aquisitionPrices[i] = aquisitionPriceOfUsers[_assetID][holder];
             ownedQuantities[i] = balanceATOfUsers[_assetID][holder];
+            offerPrices[i] = offerPriceOfUsers[_assetID][holder];
         }
-        return (holderAddresses, aquisitionPrices, ownedQuantities);
+        return (holderAddresses, aquisitionPrices, ownedQuantities,offerPrices);
     }
 
     function getAssetHoldingsOfUser(address _owner) constant returns(bytes32[],uint256[],uint256[],uint256[]){

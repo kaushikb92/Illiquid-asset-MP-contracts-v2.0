@@ -8,19 +8,16 @@ contract AssetRegister{
     assetDetails[] public Assets;
 
     /* Stracture to hold each user's details*/
-    mapping(bytes32=> assetDetails)  assetDetailsByAID;
+    mapping(bytes32=>assetDetails) assetDetailsByAID;
 
     struct assetIdsByType{
         bytes32[] AID;
     }
 
-    mapping(bytes32=> assetIdsByType)  assetDetailsByAssetType;
-   
-    mapping(bytes32=> uint256) public marketPricePerAssetId;
-
-    mapping(address=> mapping(bytes32=>bool)) public assetVisibility;
-
-    mapping (bytes32=>bytes32) public customAssetDescription;
+    mapping(bytes32=>assetIdsByType)  assetDetailsByAssetType;
+    mapping(bytes32=>uint256) public marketPricePerAssetId;
+    mapping(address=>mapping(bytes32=>bool)) public assetVisibility;
+    mapping(bytes32=>uint) public assetTimestamp;
    
     /* Stracture to hold traded assets ids*/
     struct assetByOwner{
@@ -28,41 +25,32 @@ contract AssetRegister{
     }
 
     /* Map to link traded asset ids for separate wallet addresses*/
-    mapping(address => assetByOwner) assetsByOwner;
+    mapping(address=>assetByOwner) assetsByOwner;
 
     /* Stracture to hold asset details*/
     struct assetDetails{
         bytes32 assetName;
-        bytes32 assetType;
         bytes32 assetSubType;
         bytes32 assetID;
-        uint timestamp;
         bytes32 cmpnyName;
-    }
-
-    function addCustomAssetDescription(bytes32 _description,bytes32 _assetID) returns (bool success){
-        customREAssetDescription[_assetID] = _description;
-        return true;
-    }
-
-    function getCustomAssetDescription(bytes32 _assetID) returns (bytes32){
-        return customREAssetDescription[_assetID];
+        bytes32 description;
     }
 
     /* Function to register a new asset*/
-    function addNewAsset(bytes32 _assetName, bytes32 _assetType, bytes32 _assetSubType, bytes32 _assetID, ) returns (bool addAsset_Status){
+    function addNewAsset(bytes32 _assetName, bytes32 _assetType, bytes32 _assetSubType, bytes32 _assetID, bytes32 _cmpnyName, bytes32 _description) returns (bool addAsset_Status){
 
         assetDetails memory newRegdAsset;
         newRegdAsset.assetName = _assetName;
-        newRegdAsset.assetType = _assetType;
         newRegdAsset.assetID = _assetID;
         newRegdAsset.assetSubType = _assetSubType;
-        newRegdAsset.timestamp = block.timestamp;
+        newRegdAsset.cmpnyName = _cmpnyName;
+        newRegdAsset.description = _description;
         Assets.push(newRegdAsset);
 
         //assetVisibility[_ownerOfAsset][_assetID] = true;
         assetDetailsByAID[_assetID] = newRegdAsset;
         assetDetailsByAssetType[_assetType].AID.push(_assetID);
+        assetTimestamp[_assetID] = block.timestamp;
         //assetWalletAddress[_ownerOfAsset] = _assetID;
         //assetQuantityOfOwner[_ownerOfAsset][_assetID] = _quantity;
         //assetPrice[_assetID] = _priceOfEach;
@@ -75,28 +63,23 @@ contract AssetRegister{
         return (assetDetailsByAssetType[_assetType].AID);
     }
 
-    function getAllAssetDetails() constant returns(bytes32[],uint[],bytes32[],bytes32[],bytes32[]){
-        uint length = Assets.length;
+    function getAssetDetailsByType(bytes32 _assetType) constant returns(bytes32[],bytes32[],bytes32[],bytes32[],bytes32[]){
+        uint length = assetDetailsByAssetType[_assetType].AID.length;
         bytes32[] memory assetIDs = new bytes32[](length);
         bytes32[] memory assetNames = new bytes32[](length);
-        bytes32[] memory assetTypes = new bytes32[](length);
         bytes32[] memory assetSubTypes = new bytes32[](length);
-        uint[] memory timestamps = new uint[](length); 
-
-        for (i = 0; i < length; i++) {
-
-                assetDetails memory currentAsset;
-                currentAsset = Assets[i];
-                assetIDs[i] = currentAsset.assetID;
-                timestamps[i] = currentAsset.timestamp;
-                assetTypes[i] = currentAsset.assetType;
-                assetSubTypes[i] = currentAsset.assetSubType;
-                assetNames[i] = currentAsset.assetName;
-                
-            }
-            return(assetIDs,timestamps,assetTypes,assetNames,assetSubTypes);
+        bytes32[] memory cmpnyNames = new bytes32[](length);
+        bytes32[] memory descriptions = new bytes32[](length);
+        assetIDs = assetDetailsByAssetType[_assetType].AID;
+        for (i = 0; i< length; i++){
+            bytes32 _assetID = assetIDs[i];
+            assetNames[i] = assetDetailsByAID[_assetID].assetName;
+            assetSubTypes[i] = assetDetailsByAID[_assetID].assetSubType;
+            cmpnyNames[i] = assetDetailsByAID[_assetID].cmpnyName;
+            descriptions[i] = assetDetailsByAID[_assetID].description;
+        }
+        return (assetIDs,assetNames,assetSubTypes,cmpnyNames,descriptions);
     }
-
 
     function setMarketPrice(bytes32 _assetID,uint256 _marketPrice) returns (bool _success){
         marketPricePerAssetId[_assetID] = _marketPrice;
@@ -170,7 +153,32 @@ contract AssetRegister{
         }
     }
 
+    function getAssetTimestamp(bytes32 _assetID) constant returns(uint){
+        return (assetTimestamp[_assetID]);
+    }
 
 
+ // function getAllAssetDetails() constant returns(bytes32[],uint[],bytes32[],bytes32[],bytes32[]){
+    //     uint length = Assets.length;
+    //     bytes32[] memory assetIDs = new bytes32[](length);
+    //     bytes32[] memory assetNames = new bytes32[](length);
+    //     bytes32[] memory assetTypes = new bytes32[](length);
+    //     bytes32[] memory assetSubTypes = new bytes32[](length);
+    //     uint[] memory timestamps = new uint[](length); 
+    //     bytes32[] memory cmpnyNames = new bytes32[](length);
+
+    //     for (i = 0; i < length; i++) {
+
+    //             assetDetails memory currentAsset;
+    //             currentAsset = Assets[i];
+    //             assetIDs[i] = currentAsset.assetID;
+    //             timestamps[i] = currentAsset.timestamp;
+    //             assetTypes[i] = currentAsset.assetType;
+    //             assetSubTypes[i] = currentAsset.assetSubType;
+    //             assetNames[i] = currentAsset.assetName;
+    //             cmpnyNames[i] = currentAsset.cmpnyName;
+    //         }
+    //         return(assetIDs,timestamps,assetTypes,assetNames,assetSubTypes,cmpnyNames);
+    // }
 
 }

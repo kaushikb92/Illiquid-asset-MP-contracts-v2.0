@@ -20,6 +20,7 @@ contract REAssets{
     mapping (bytes32=>address) mapREAssetsWithAddress;
     mapping (bytes32=>bool) public newREAssetRequestStatus;
     mapping (bytes32=>newREAssetRequest) REAssetRequestsByAssetId;
+    mapping (bytes32=>bytes32) REAssetDescription;
         
     struct REAssetsByUser{
         bytes32[] assetId;
@@ -29,7 +30,7 @@ contract REAssets{
 
     uint i;
 
-    function addNewREAssetRequest(address _requestRaiser,bytes32 _assetSubType, bytes32 _assetName, bytes32 _add1, bytes32 _lat, bytes32 _long,bytes32 _assetID) returns (bool _status){
+    function addNewREAssetRequest(address _requestRaiser,bytes32 _assetSubType, bytes32 _assetName, bytes32 _add1, bytes32 _lat, bytes32 _long, bytes32 _assetID, bytes32 _assetDescription) returns (bool _status){
 
         newREAssetRequest memory newRequest;
         newRequest.assetName = _assetName;
@@ -45,10 +46,11 @@ contract REAssets{
         mapREAssetsWithAddress[_assetID] = _requestRaiser; 
         REAssetsByUsers[_requestRaiser].assetId.push(_assetID);
         REAssetRequestsByAssetId[_assetID] = newRequest;
+        REAssetDescription[_assetID] = _assetDescription;
         return true;
     }
 
-    function addNewREAssetByAdmin( bytes32 _assetName,bytes32 _assetSubType, bytes32 _add1, bytes32 _lat, bytes32 _long,bytes32 _assetID)returns(bool success){
+    function addNewREAssetByAdmin( bytes32 _assetName,bytes32 _assetSubType, bytes32 _add1, bytes32 _lat, bytes32 _long,bytes32 _assetID, bytes32 _assetDescription)returns(bool success){
         newREAssetRequest memory newRequest;
         newRequest.assetName = _assetName;
         newRequest.add1 = _add1;
@@ -59,6 +61,8 @@ contract REAssets{
         newRequest.timestamp = block.timestamp;
         allNewREAssetRequests.push(newRequest);
         REAssetRequestsByAssetId[_assetID] = newRequest;
+        REAssetDescription[_assetID] = _assetDescription;
+        
     }
 
     function addNewREAssetByBuyer( address _requestRaiser, uint256 _aquisitionPrice, uint256 _OfferPrice, bytes32 _assetID) returns (bool _success){
@@ -80,6 +84,10 @@ contract REAssets{
         else{
             return true;
         }
+    }
+
+    function getREAssetDescription(bytes32 _assetID)constant returns(bytes32){
+        return(REAssetDescription[_assetID]);
     }
 
     function updateOfferPrice(bytes32 _assetId, address _requestRaiser, uint256 _OfferPrice) returns (bool success){
@@ -179,7 +187,7 @@ contract REAssets{
                     longs[i] = currentRequest.long;
                 }
             }
-            return(assetIds,add1s,asseetSubTypes,timestamps,assetNames,lats,longs);
+            return(assetIds,add1s,asseetSubTypes,assetNames,lats,longs);
     }
 
       function getAllREAssetDetails() constant returns (bytes32[],bytes32[],bytes32[],uint[],bytes32[],bytes32[],bytes32[]){
