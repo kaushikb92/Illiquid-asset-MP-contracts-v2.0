@@ -8,7 +8,7 @@ contract MPAssetRequests{
         bytes32 assetType;
         bytes32 asseetSubType;
         bytes32 companyName;
-        uint timestamp;
+        uint256 timestamp;
         bytes8 requestId;
     }
 
@@ -22,14 +22,14 @@ contract MPAssetRequests{
 
     mapping (address=>MPAssetRequestsByUser) MPLevelAssetRequestsByUser;
 
-    function addNewMPAssetRequest(bytes32 _assetSubType,bytes8 _requestId, bytes32 _assetName, bytes32 _companyName, address _requestRaiser, bytes32 _assetType, bytes32 _assetID) returns (bool _status){
+    function addNewMPAssetRequest(bytes32 _assetSubType,bytes8 _requestId, bytes32 _assetName, bytes32 _companyName, address _requestRaiser, bytes32 _assetType, bytes32 _assetID,uint256 _timestamp) returns (bool _status){
 
         newMPAssetRequest memory newRequest;
         newRequest.assetName = _assetName;
         newRequest.assetType = _assetType;
         newRequest.companyName = _companyName;
         newRequest.asseetSubType = _assetSubType;
-        newRequest.timestamp = block.timestamp;
+        newRequest.timestamp = _timestamp;
         allMPLevelAssetRequests.push(newRequest);
 
         MPLevelAssetRequestsByUser[_requestRaiser].requestId.push(_requestId);
@@ -46,11 +46,11 @@ contract MPAssetRequests{
         return (requestIds);
     }
 
-    function getMPAssetRequestsById(bytes8 _requestId) constant returns(bytes32,bytes32,bytes32,bytes32,uint,bool){
+    function getMPAssetRequestsById(bytes8 _requestId) constant returns(bytes32,bytes32,bytes32,bytes32,uint256,bool){
         return(MPAssetById[_requestId].assetName,MPAssetById[_requestId].assetType,MPAssetById[_requestId].companyName,MPAssetById[_requestId].asseetSubType,MPAssetById[_requestId].timestamp,MPAssetStatus[_requestId]);
     }
 
-    function getAllMPAssetRequestsForAdd() constant returns (bytes32[],bytes32[],bytes32[],bytes32[],uint[],bytes8[]){
+    function getAllMPAssetRequestsForAdd() constant returns (bytes32[],bytes32[],bytes32[],bytes32[],uint256[],bytes8[]){
         uint length = allMPLevelAssetRequests.length;
         bytes32[] memory assetNames = new bytes32[](length);
         bytes32[] memory assetTypes = new bytes32[](length);
@@ -77,7 +77,7 @@ contract MPAssetRequests{
             return(assetNames,assetTypes,companyNames,asseetSubTypes,timestamps,requestIds);
     }
 
-    function getMPAllAssetRequests() constant returns (bytes32[],bytes32[],bytes32[],bytes32[],uint[],bytes8[]){
+    function getMPAllAssetRequests() constant returns (bytes32[],bytes32[],bytes32[],bytes32[],uint256[],bytes8[]){
        // uint length = allMPLevelAssetRequests.allMPLevelAssetRequests.length;
         bytes32[] memory assetNames = new bytes32[](allMPLevelAssetRequests.length);
         bytes32[] memory assetTypes = new bytes32[](allMPLevelAssetRequests.length);

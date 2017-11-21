@@ -7,7 +7,7 @@ contract AssetTypes{
     }
 
     mapping(bytes32=>subType) mapSubTypes;
-    mapping(bytes32=>uint) mapSubTypesWithTimestamps;
+    mapping(bytes32=>uint256) mapSubTypesWithTimestamps;
 
     struct assetIds{
         bytes32[] assetId;
@@ -15,7 +15,7 @@ contract AssetTypes{
 
     mapping(bytes32=>assetIds) mapAssetIdsWithSubTypes;
 
-    function addNewAssetSubType(bytes32 _typeName,bytes32 _subTypeName,uint _timestamp,bytes32 _assetId) returns (bool success){
+    function addNewAssetSubType(bytes32 _typeName,bytes32 _subTypeName,uint256 _timestamp,bytes32 _assetId) returns (bool success){
         mapSubTypes[_typeName].subTypeName.push(_subTypeName);  
         mapSubTypesWithTimestamps[_subTypeName] = _timestamp;
         addAssetIdsPerSubTypes(_subTypeName,_assetId);
@@ -28,10 +28,10 @@ contract AssetTypes{
         return true;
     }
 
-    function getSubTypes(bytes32 _typeName) constant returns (bytes32[],uint[]){
+    function getSubTypes(bytes32 _typeName) constant returns (bytes32[],uint256[]){
         uint length = mapSubTypes[_typeName].subTypeName.length;
         bytes32[] memory subTypes = new bytes32[](length);
-        uint[] memory timestamps = new uint[](length);
+        uint256[] memory timestamps = new uint256[](length);
         subTypes = mapSubTypes[_typeName].subTypeName;
         for (uint i = 0; i<length;i++ ){
             bytes32 subtype = subTypes[i];

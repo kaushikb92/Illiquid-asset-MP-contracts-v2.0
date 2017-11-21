@@ -225,8 +225,124 @@
       "links": {},
       "address": "0x300f22a0397afcdb66c354b930dbc066f1593ad8",
       "updated_at": 1510553544488
+    },
+    "1511004744230": {
+      "events": {
+        "0xf5ca2cac7d01d9b05d6a1d7c7ad8e206b4a68fcdc340ccf5cd15b58b611dccd8": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "from",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "to",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "value",
+              "type": "uint256"
+            }
+          ],
+          "name": "currencyTransfer",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0xafcaaa51077fc08724361aef3b41e1a1982413ae",
+      "updated_at": 1511006233366
+    },
+    "1511006414079": {
+      "events": {
+        "0xf5ca2cac7d01d9b05d6a1d7c7ad8e206b4a68fcdc340ccf5cd15b58b611dccd8": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "from",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "to",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "value",
+              "type": "uint256"
+            }
+          ],
+          "name": "currencyTransfer",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x3bb7da87de6972ca77d4dd6fa64c948b9d22cc63",
+      "updated_at": 1511006724789
+    },
+    "1511006778586": {
+      "events": {
+        "0xf5ca2cac7d01d9b05d6a1d7c7ad8e206b4a68fcdc340ccf5cd15b58b611dccd8": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "from",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "to",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "value",
+              "type": "uint256"
+            }
+          ],
+          "name": "currencyTransfer",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x9f6e97c9129af27d45d35bb05ff23ed46ec48c14",
+      "updated_at": 1511006907588
+    },
+    "1511007016752": {
+      "events": {
+        "0xf5ca2cac7d01d9b05d6a1d7c7ad8e206b4a68fcdc340ccf5cd15b58b611dccd8": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "from",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "to",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "value",
+              "type": "uint256"
+            }
+          ],
+          "name": "currencyTransfer",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0xaf2102b9f0f50a6987595d5dbe535e45657def54",
+      "updated_at": 1511007038204
     }
   },
   "schema_version": "0.0.5",
-  "updated_at": 1510553544488
+  "updated_at": 1511007038204
 }

@@ -8,7 +8,7 @@ contract BidRequests{
         bytes32 buyerId;
         uint256 bidAmount;
         uint bidQuantity;
-        uint timestamp;
+        uint256 timestamp;
         bytes8 bidId;
     }
 
@@ -31,9 +31,24 @@ contract BidRequests{
 
     mapping (bytes32=>bidsByBuyer) mapBidsByBuyer;
 
+    struct bidsOnSeller{
+        bytes8[] bidId;
+    }
+
+    mapping(bytes32=>bidsOnSeller) mapBidsOnSeller;
+
+    uint i;
+
     mapping (bytes32=>mapping(bytes32=>bytes8)) mapBidsByBuyerWithAssetId;
 
-    function addNewBid( bytes32 _assetId, bytes32 _sellerId,bytes32 _buyerId,uint256 _bidAmount,uint _bidQuantity,bytes8 _bidId, address _requestRaiser)returns (bool _status){
+    function addNewBid( bytes32 _assetId, 
+    bytes32 _sellerId,
+    bytes32 _buyerId,
+    uint256 _bidAmount,
+    uint _bidQuantity,
+    bytes8 _bidId, 
+    address _requestRaiser,
+    uint256 _timestamp)returns (bool _status){
 
         bidRequest memory currentBid;
         currentBid.assetId = _assetId;
@@ -41,7 +56,7 @@ contract BidRequests{
         currentBid.buyerId = _buyerId;
         currentBid.bidAmount = _bidAmount;
         currentBid.bidQuantity = _bidQuantity;
-        currentBid.timestamp = block.timestamp;
+        currentBid.timestamp = _timestamp;
         currentBid.bidId = _bidId;
         allBidRequest.push(currentBid);
 
@@ -50,11 +65,48 @@ contract BidRequests{
 
         mapBidsByBuyerWithAssetId[_assetId][_buyerId] = _bidId;
         bidRequestOnAssetByAssetId[_sellerId][_assetId].bidId.push(_bidId);
+        mapBidsOnSeller[_sellerId].bidId.push(_bidId);
         mapBidsByBuyer[_buyerId].bidId.push(_bidId);
         bidRequestById[_bidId] = currentBid;
         bidRequestStatus[_bidId] = false;
 
         return true;
+    }
+
+    bytes8 currentbid;
+
+    function getValidBidCountsBySellerID(bytes32 _sellerID,bytes32 _assetId) constant returns(uint){
+        uint length = bidRequestOnAssetByAssetId[_sellerID][_assetId].bidId.length;
+        bytes8[] memory bidIds = new bytes8[](length);
+        bidIds = bidRequestOnAssetByAssetId[_sellerID][_assetId].bidId;
+        uint count;
+        for(i=0;i<length;i++){
+            currentbid = bidIds[i];
+            if(!(bidRequestStatus[currentbid])){
+                count++;
+            }
+        }
+        return (count);
+    }
+
+    function getBidsOnSeller(bytes32 __sellerId) constant returns (bytes8[],bytes32[],uint256[],uint[],uint256[],bytes32[]){
+        uint length = mapBidsOnSeller[__sellerId].bidId.length;
+        bytes8[] memory bidIds = new bytes8[](length);
+        bytes32[] memory assetIds = new bytes32[](length);
+        uint256[] memory bidAmounts = new uint256[](length);
+        uint[] memory bidQuantitys = new uint[](length);
+        uint[] memory timestamps = new uint[](length);
+        bytes32[] memory buyerIds = new bytes32[](length);
+        bidIds = mapBidsOnSeller[__sellerId].bidId;
+        for(i=0;i<length;i++){
+            currentbid = bidIds[i];
+            assetIds[i] = bidRequestById[currentbid].assetId;
+            bidAmounts[i] = bidRequestById[currentbid].bidAmount;
+            bidQuantitys[i] = bidRequestById[currentbid].bidQuantity;
+            timestamps[i] = bidRequestById[currentbid].timestamp;
+            buyerIds[i] = bidRequestById[currentbid].buyerId;
+        }
+        return(bidIds,assetIds,bidAmounts,bidQuantitys,timestamps,buyerIds);
     }
 
     function getAllBidsByBuyer(bytes32 _buyerId) constant returns (bytes8[]){
@@ -71,8 +123,14 @@ contract BidRequests{
         return (requestIds);
     }
 
-    function getBidsByBidId(bytes8 _bidId) constant returns (bytes32,bytes32,bytes32,uint256,uint,uint,bool){
-        return (bidRequestById[_bidId].assetId,bidRequestById[_bidId].sellerId,bidRequestById[_bidId].buyerId,bidRequestById[_bidId].bidAmount,bidRequestById[_bidId].bidQuantity,bidRequestById[_bidId].timestamp,bidRequestStatus[_bidId]);
+    function getBidsByBidId(bytes8 _bidId) constant returns (bytes32,bytes32,bytes32,uint256,uint,uint256,bool){
+        return (bidRequestById[_bidId].assetId,
+        bidRequestById[_bidId].sellerId,
+        bidRequestById[_bidId].buyerId,
+        bidRequestById[_bidId].bidAmount,
+        bidRequestById[_bidId].bidQuantity,
+        bidRequestById[_bidId].timestamp,
+        bidRequestStatus[_bidId]);
     }
 
     function approveBid(bytes8 _bidId) returns (bool success){

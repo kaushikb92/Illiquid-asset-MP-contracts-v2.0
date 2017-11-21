@@ -8,6 +8,7 @@ contract RegReceipts{
         uint quantity;
         uint256 acqPrice;
         uint256 marketPrice;
+        uint256 timestamp;
     }
 
     ownerAssetReg[] public AllAssetRegs;
@@ -22,14 +23,14 @@ contract RegReceipts{
 
     uint i;
 
-    function addRegReceipt(bytes8 _receiptId, bytes32 _assetId, uint _quantity, uint256 _acqPrice, uint256 _mp,bytes32 _userId) returns (bool _success){
+    function addRegReceipt(bytes8 _receiptId, bytes32 _assetId, uint _quantity, uint256 _acqPrice, uint256 _mp,bytes32 _userId,uint256 _timestamp) returns (bool _success){
         ownerAssetReg memory newAssetReg;
         newAssetReg.receiptId = _receiptId;
         newAssetReg.assetId = _assetId;
         newAssetReg.quantity = _quantity;
         newAssetReg.acqPrice = _acqPrice;
         newAssetReg.marketPrice = _mp;
-
+        newAssetReg.timestamp = _timestamp;
         AllAssetRegs.push(newAssetReg);
 
         regReceiptsByUser[_userId].receiptId.push(_receiptId);
@@ -38,23 +39,28 @@ contract RegReceipts{
 
     }
 
-    function getAssetRegReceiptsByUser(bytes32 _userId) constant returns(bytes8[],bytes32[],uint[],uint256[],uint256[]){
-        uint length = regReceiptsByUser[_userId].receiptId.length;
+    uint length;
+    bytes8 _receiptId;
+
+    function getAssetRegReceiptsByUser(bytes32 _userId) constant returns(bytes8[],bytes32[],uint[],uint256[],uint256[],uint256[]){
+        length = regReceiptsByUser[_userId].receiptId.length;
         bytes8[] memory receiptIds = new bytes8[](length);
         bytes32[] memory assetIds = new bytes32[](length);
         uint[] memory quantities = new uint[](length);
         uint256[] memory acqPrices = new uint256[](length);
-        uint256[] memory marketPrices = new uint256[](length); 
+        uint256[] memory marketPrices = new uint256[](length);
+        uint256[] memory timestamps = new uint256[](length); 
 
         receiptIds = regReceiptsByUser[_userId].receiptId;
 
         for (i=0;i<length;i++){
-            bytes8 _receiptId = receiptIds[i];
+            _receiptId = receiptIds[i];
             assetIds[i] = assetRegsbyReceiptId[_receiptId].assetId;
             quantities[i] = assetRegsbyReceiptId[_receiptId].quantity;
             acqPrices[i] = assetRegsbyReceiptId[_receiptId].acqPrice;
             marketPrices[i] = assetRegsbyReceiptId[_receiptId].marketPrice;
-        }return(receiptIds,assetIds,quantities,acqPrices,marketPrices);
+            timestamps[i] = assetRegsbyReceiptId[_receiptId].timestamp;
+        }return(receiptIds,assetIds,quantities,acqPrices,marketPrices,timestamps);
     }
     
 

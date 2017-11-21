@@ -12,6 +12,9 @@ contract AssetToken is AssetRegister{
     mapping(bytes32=>mapping(address=>uint256)) public offerPriceOfUsers;
     mapping(bytes32=>uint256) public highOfferPricePerAsset;
     mapping(bytes32=>uint256) public lowOfferPricePerAsset;
+    mapping(bytes32=>uint256) public currentQuantityOfAsset;
+
+    
 
     /* This generates a public event on the blockchain that will notify clients */
     event assetTransfer(address indexed from, address indexed to, uint256 value, bytes32 assetName);
@@ -29,21 +32,37 @@ contract AssetToken is AssetRegister{
 
     uint i;
 
+    function increaseAssetCount(bytes32 _assetID, uint _count) returns (bool _success){
+        uint count = currentQuantityOfAsset[_assetID];
+        count =+_count;
+        currentQuantityOfAsset[_assetID] = count;
+        return true;
+    }
+
     /* Function to mint tokens as per the registered asset's details with the seller's wallet address*/
     function setAssetToken(address _assetOwner, bytes32 _assetID, uint256 _tokensToMint, uint256 _aquisitionPrice, uint256 _offerPrice) returns (bool success){
+        if(!(AssetRegister.checkAssetHolding(_assetOwner,_assetID))){
         balanceATOfUsers[_assetID][_assetOwner] = _tokensToMint;
         aquisitionPriceOfUsers[_assetID][_assetOwner] = _aquisitionPrice;
         AssetRegister.addAssetWithWalletInReg(_assetOwner,_assetID);
         mapAssetholders[_assetID].holders.push(_assetOwner);
         offerPriceOfUsers[_assetID][_assetOwner] = _offerPrice;
+        }
+        else{
+            balanceATOfUsers[_assetID][_assetOwner] += _tokensToMint;
+            aquisitionPriceOfUsers[_assetID][_assetOwner] = _aquisitionPrice;
+            offerPriceOfUsers[_assetID][_assetOwner] = _offerPrice;
+        }
 
+        bool c = increaseAssetCount(_assetID, _tokensToMint);
         bool a = setHighAcqPrice(_assetID, _offerPrice);
         bool b = setLowAcqPrice(_assetID, _offerPrice);
-        //AssetRegister.enableVisibility(_to,_assetID);
-        
-        // else if (lowOfferPricePerAsset[_assetID] >= _aquisitionPrice){lowOfferPricePerAsset[_assetID] = _aquisitionPrice;}
         
         return true;
+    }
+
+    function checkAssetQuantity(bytes32 _assetID) constant returns(uint){
+        return (currentQuantityOfAsset[_assetID]);
     }
 
     function setHighAcqPrice(bytes32 _assetID, uint256 _offerPrice) returns (bool _success){
@@ -92,14 +111,14 @@ contract AssetToken is AssetRegister{
         bytes32[] memory assetIDs = new bytes32[](length);
         uint256[] memory aquisitionPrices = new uint256[](length);
         uint256[] memory ownedQuantities = new uint256[](length);
-        assetIDs = AssetRegister.getAsseTIdsForUser(_owner);
+        assetIDs = AssetRegister.getAssetIDsForUser(_owner);
         uint256[] memory assetMarketPrices = new uint256[](length);
 
         for (i=0;i<length;i++){
             bytes32 _assetId = assetIDs[i];
             aquisitionPrices[i] = aquisitionPriceOfUsers[_assetId][_owner];
             ownedQuantities[i] = balanceATOfUsers[_assetId][_owner];
-            assetMarketPrices[i] = AssetRegister.getMarketPrice(_assetId);
+            assetMarketPrices[i] = offerPriceOfUsers[_assetId][_owner];
         }
         return (assetIDs,aquisitionPrices,ownedQuantities,assetMarketPrices);
     }
@@ -115,15 +134,16 @@ contract AssetToken is AssetRegister{
     }
 
     /* Function to trade asset from seller to buyer */
-    function ATtransfer( bytes32 _assetID, address _from, address _to, uint256 _value) returns (bool success) {
+    function ATtransfer( bytes32 _assetID, address _from, address _to, uint256 _value, uint256 _pricePerAsset) returns (bool success) {
         if (_to == 0x0) throw;                               // Prevent transfer to 0x0 address
         if (balanceATOfUsers[_assetID][_from] < _value) throw;           // Check if the sender has enough
         if (balanceATOfUsers[_assetID][_to] + _value < balanceATOfUsers[_assetID][_to]) throw; // Check for overflows
         balanceATOfUsers[_assetID][_from] -= _value;                     // Subtract from the sender
-        balanceATOfUsers[_assetID][_to] += _value;   
-        assetTransfer(ATOwner, _to, _value, _assetID);                   // Notify anyone listening that this transfer took place
+        balanceATOfUsers[_assetID][_to] += _value;
+        aquisitionPriceOfUsers[_assetID][_to] = _pricePerAsset;
+        assetTransfer(_from, _to, _value, _assetID);                   // Notify anyone listening that this transfer took place
         mapAssetholders[_assetID].holders.push(_to);
         AssetRegister.addAssetWithWalletAfterSell(_to,_assetID);
-        AssetRegister.disableVisibility(_to,_assetID);
+        return true;
     }   
 }

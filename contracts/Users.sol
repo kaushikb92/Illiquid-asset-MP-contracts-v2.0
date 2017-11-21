@@ -62,6 +62,10 @@ contract Users{
         }
     }
 
+    function getUserIDByAddress(address _user) constant returns(bytes32){
+        return(UserIDsWithAddress[_user]);
+    }
+
     /* Function to query user details with associated wallet address*/
     function getUserDetailsByWallet(address _walletAddr) constant returns (bytes32, bytes32, bytes32, uint, uint){
         bytes32 _firstName = userDetails[_walletAddr].firstName;

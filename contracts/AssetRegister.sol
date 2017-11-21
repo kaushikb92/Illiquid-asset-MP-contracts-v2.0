@@ -17,7 +17,7 @@ contract AssetRegister{
     mapping(bytes32=>assetIdsByType)  assetDetailsByAssetType;
     mapping(bytes32=>uint256) public marketPricePerAssetId;
     mapping(address=>mapping(bytes32=>bool)) public assetVisibility;
-    mapping(bytes32=>uint) public assetTimestamp;
+    mapping(bytes32=>uint256) public assetTimestamp;
    
     /* Stracture to hold traded assets ids*/
     struct assetByOwner{
@@ -34,10 +34,11 @@ contract AssetRegister{
         bytes32 assetID;
         bytes32 cmpnyName;
         bytes32 description;
+        bytes32 assetType;
     }
 
     /* Function to register a new asset*/
-    function addNewAsset(bytes32 _assetName, bytes32 _assetType, bytes32 _assetSubType, bytes32 _assetID, bytes32 _cmpnyName, bytes32 _description) returns (bool addAsset_Status){
+    function addNewAsset(bytes32 _assetName, bytes32 _assetType, bytes32 _assetSubType, bytes32 _assetID, bytes32 _cmpnyName, bytes32 _description,uint256 _timestamp) returns (bool addAsset_Status){
 
         assetDetails memory newRegdAsset;
         newRegdAsset.assetName = _assetName;
@@ -45,12 +46,13 @@ contract AssetRegister{
         newRegdAsset.assetSubType = _assetSubType;
         newRegdAsset.cmpnyName = _cmpnyName;
         newRegdAsset.description = _description;
+        newRegdAsset.assetType = _assetType;
         Assets.push(newRegdAsset);
 
         //assetVisibility[_ownerOfAsset][_assetID] = true;
         assetDetailsByAID[_assetID] = newRegdAsset;
         assetDetailsByAssetType[_assetType].AID.push(_assetID);
-        assetTimestamp[_assetID] = block.timestamp;
+        assetTimestamp[_assetID] = _timestamp;
         //assetWalletAddress[_ownerOfAsset] = _assetID;
         //assetQuantityOfOwner[_ownerOfAsset][_assetID] = _quantity;
         //assetPrice[_assetID] = _priceOfEach;
@@ -59,8 +61,67 @@ contract AssetRegister{
         return true;
     }
 
+    function addAssetWithWalletAfterSell(address _newOwner, bytes32 _assetID) returns (bool success){
+        uint length = assetsByOwner[_newOwner].AID.length;
+        bytes32[] memory assetIDs = new bytes32[](length);
+        uint count = 0;
+        assetIDs = assetsByOwner[_newOwner].AID;
+
+        for(uint i = 0; i<length; i++){
+
+            if (assetIDs[i] == _assetID){
+                count += 1;
+            }
+        }
+
+        if (count < 1)
+        {
+            assetsByOwner[_newOwner].AID.push(_assetID);
+            return true;
+        }
+        else
+        {
+            throw;
+        }
+        return true;
+    }
+
     function getAssetIdByType(bytes32 _assetType) constant returns(bytes32[]){
         return (assetDetailsByAssetType[_assetType].AID);
+    }
+
+    function getAssetTimestamp(bytes32 _assetID) constant returns(uint256){
+        return (assetTimestamp[_assetID]);
+    }
+
+    function checkAssetHolding(address _seller, bytes32 _assetID) constant returns(bool){
+        uint length = assetsByOwner[_seller].AID.length;
+        bytes32[] memory assetIDs = new bytes32[](length);
+        assetIDs = assetsByOwner[_seller].AID;
+        uint count = 0;
+        for(i=0;i<length;i++){
+            if(assetIDs[i]==_assetID){
+                count=count+1;
+            }
+        }
+        if (count> 0){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    function getAssetDetailsByAssetID(bytes32 _assetID) constant returns(bytes32,bytes32,bytes32,bytes32,bytes32){
+        return (assetDetailsByAID[_assetID].assetName,
+        assetDetailsByAID[_assetID].assetType,
+        assetDetailsByAID[_assetID].assetSubType,
+        assetDetailsByAID[_assetID].cmpnyName,
+        assetDetailsByAID[_assetID].description);
+    }
+
+    function getAssetTypeByAssetID(bytes32 _assetID) constant returns(bytes32){
+        return (assetDetailsByAID[_assetID].assetType);
     }
 
     function getAssetDetailsByType(bytes32 _assetType) constant returns(bytes32[],bytes32[],bytes32[],bytes32[],bytes32[]){
@@ -95,7 +156,7 @@ contract AssetRegister{
         return true;
     }
 
-    function getAsseTIdsForUser(address _owner) constant returns(bytes32[]){
+    function getAssetIDsForUser(address _owner) constant returns(bytes32[]){
         return (assetsByOwner[_owner].AID);
     }
 
@@ -122,41 +183,8 @@ contract AssetRegister{
         {
             assetVisibility[_owner][_assetID] = false;
         }
-        else
-        {
-            throw;
-        }
         return true;
     }
-
-    function addAssetWithWalletAfterSell(address _newOwner, bytes32 _assetID) returns (bool success){
-        uint length = assetsByOwner[_newOwner].AID.length;
-        bytes32[] memory assetIDs = new bytes32[](length);
-        uint count = 0;
-        assetIDs = assetsByOwner[_newOwner].AID;
-
-        for(uint i = 0; i<length; i++){
-
-            if (assetIDs[i] == _assetID){
-                count += 1;
-            }
-        }
-
-        if (count < 1)
-        {
-            assetsByOwner[_newOwner].AID.push(_assetID);
-            return true;
-        }
-        else
-        {
-            throw;
-        }
-    }
-
-    function getAssetTimestamp(bytes32 _assetID) constant returns(uint){
-        return (assetTimestamp[_assetID]);
-    }
-
 
  // function getAllAssetDetails() constant returns(bytes32[],uint[],bytes32[],bytes32[],bytes32[]){
     //     uint length = Assets.length;
