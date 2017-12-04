@@ -20,7 +20,9 @@ contract REAssets{
     mapping (bytes32=>address) mapREAssetsWithAddress;
     mapping (bytes32=>bool) public newREAssetRequestStatus;
     mapping (bytes32=>newREAssetRequest) REAssetRequestsByAssetId;
-    mapping (bytes32=>bytes32) REAssetDescription;
+    mapping (bytes32=>string) REAssetDescription;
+    mapping (bytes32=>bool) smVisibility;
+    mapping (bytes32=>bool) mpVisibility;
         
     struct REAssetsByUser{
         bytes32[] assetId;
@@ -30,7 +32,16 @@ contract REAssets{
 
     uint i;
 
-    function addNewREAssetRequest(address _requestRaiser,bytes32 _assetSubType, bytes32 _assetName, bytes32 _add1, bytes32 _lat, bytes32 _long, bytes32 _assetID, bytes32 _assetDescription,uint256 _timestamp) returns (bool _status){
+    function addNewREAssetRequest(
+    address _requestRaiser,
+    bytes32 _assetSubType, 
+    bytes32 _assetName, 
+    bytes32 _add1, 
+    bytes32 _lat, 
+    bytes32 _long, 
+    bytes32 _assetID, 
+    string _assetDescription,
+    uint256 _timestamp) returns (bool _status){
 
         newREAssetRequest memory newRequest;
         newRequest.assetName = _assetName;
@@ -47,10 +58,20 @@ contract REAssets{
         REAssetsByUsers[_requestRaiser].assetId.push(_assetID);
         REAssetRequestsByAssetId[_assetID] = newRequest;
         REAssetDescription[_assetID] = _assetDescription;
+        mpVisibility[_assetID] = false;
+        smVisibility[_assetID] = true;
         return true;
     }
 
-    function addNewREAssetByAdmin( bytes32 _assetName,bytes32 _assetSubType, bytes32 _add1, bytes32 _lat, bytes32 _long,bytes32 _assetID, bytes32 _assetDescription,uint256 _timestamp)returns(bool success){
+    function addNewREAssetByAdmin( 
+        bytes32 _assetName,
+        bytes32 _assetSubType, 
+        bytes32 _add1, 
+        bytes32 _lat, 
+        bytes32 _long,
+        bytes32 _assetID, 
+        string _assetDescription,
+        uint256 _timestamp)returns(bool success){
         newREAssetRequest memory newRequest;
         newRequest.assetName = _assetName;
         newRequest.add1 = _add1;
@@ -63,10 +84,16 @@ contract REAssets{
         newREAssetRequestStatus[_assetID] = false;
         REAssetRequestsByAssetId[_assetID] = newRequest;
         REAssetDescription[_assetID] = _assetDescription;
+        mpVisibility[_assetID] = false;
+        smVisibility[_assetID] = true;
         return true;
     }
 
-    function addNewREAssetByBuyer( address _requestRaiser, uint256 _aquisitionPrice, uint256 _OfferPrice, bytes32 _assetID) returns (bool _success){
+    function addNewREAssetByBuyer( 
+        address _requestRaiser, 
+        uint256 _aquisitionPrice, 
+        uint256 _OfferPrice, 
+        bytes32 _assetID) returns (bool _success){
         uint count = 0;
         mapOfferPriceWithRE[_assetID] = _OfferPrice;
         mapAquisitionPrice[_assetID] = _aquisitionPrice;
@@ -74,6 +101,8 @@ contract REAssets{
         assetIds = REAssetsByUsers[_requestRaiser].assetId;
         mapREAssetsWithAddress[_assetID] = _requestRaiser;
         newREAssetRequestStatus[_assetID] = true;
+        mpVisibility[_assetID] = true;
+        smVisibility[_assetID] = false;
         for(i=0;i<REAssetsByUsers[_requestRaiser].assetId.length;i++){
             if(_assetID == assetIds[i]){
                 count++;
@@ -95,7 +124,7 @@ contract REAssets{
         return (mapREAssetsWithAddress[_assetID]);
     }
 
-    function getREAssetDescription(bytes32 _assetID)constant returns(bytes32){
+    function getREAssetDescription(bytes32 _assetID)constant returns(string){
         return(REAssetDescription[_assetID]);
     }
 
@@ -132,11 +161,46 @@ contract REAssets{
         return newREAssetRequestStatus[_assetID];
     }
 
-    function transferAssetsAfterSell(address _from, address _to, bytes32 _assetId) returns (bool success){
+    function transferAssetsAfterSell(
+    address _from, 
+    address _to, 
+    bytes32 _assetId, 
+    uint256 _aquisitionPrice) returns (bool success){
         if (mapREAssetsWithAddress[_assetId] != _from) throw; 
         mapREAssetsWithAddress[_assetId] = _to;
+        mapAquisitionPrice[_assetId] = _aquisitionPrice;
         REAssetsByUsers[_to].assetId.push(_assetId);
+        mpVisibility[_assetId] = false;
+        smVisibility[_assetId] = false;
         return true;
+   }
+
+   function setREAssetMPVisibility(bytes32 _assetID,bool _status1)returns(bool success){
+        mpVisibility[_assetID] = _status1;
+        return true;
+   }
+
+   function setREAssetSMVisibility(bytes32 _assetID,bool _status1)returns(bool success){
+        smVisibility[_assetID] = _status1;
+        return true;
+   }
+
+   function getREAssetSMVisibility(bytes32 _assetID)constant returns(bool){
+       return (smVisibility[_assetID]);
+   }
+
+   function getREAssetMPVisibility(bytes32 _assetID)constant returns(bool){
+       return (mpVisibility[_assetID]);
+   }
+
+   function getREAssetDetailsForHoldings(bytes32 _assetID) constant returns(bytes32,bytes32,bytes32,bytes32,uint256,uint256,bool){
+      return( REAssetRequestsByAssetId[_assetID].asseetSubType,
+      REAssetRequestsByAssetId[_assetID].add1,
+      REAssetRequestsByAssetId[_assetID].lat,
+      REAssetRequestsByAssetId[_assetID].long,
+      mapAquisitionPrice[_assetID],
+      mapOfferPriceWithRE[_assetID],
+      mpVisibility[_assetID]);
    }
 
     function getREAssetsDetailsById(bytes32 _assetId) constant returns(bytes32,bytes32,uint256,bytes32,bytes32,bytes32,address){

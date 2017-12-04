@@ -341,8 +341,37 @@
       "links": {},
       "address": "0xaf2102b9f0f50a6987595d5dbe535e45657def54",
       "updated_at": 1511007038204
+    },
+    "1511336539951": {
+      "events": {
+        "0xf5ca2cac7d01d9b05d6a1d7c7ad8e206b4a68fcdc340ccf5cd15b58b611dccd8": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "from",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "to",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "value",
+              "type": "uint256"
+            }
+          ],
+          "name": "currencyTransfer",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x0054dfe97961dc7d3027d54acf18f8ec6a711654",
+      "updated_at": 1511336598901
     }
   },
   "schema_version": "0.0.5",
-  "updated_at": 1511007038204
+  "updated_at": 1511336598901
 }

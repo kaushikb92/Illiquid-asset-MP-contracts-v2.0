@@ -81,7 +81,7 @@ contract AssetRegister{
         }
         else
         {
-            throw;
+            return false;
         }
         return true;
     }
@@ -112,12 +112,13 @@ contract AssetRegister{
         }
     }
 
-    function getAssetDetailsByAssetID(bytes32 _assetID) constant returns(bytes32,bytes32,bytes32,bytes32,bytes32){
+    function getAssetDetailsByAssetID(bytes32 _assetID, address _owner) constant returns(bytes32,bytes32,bytes32,bytes32,bytes32,bool){
         return (assetDetailsByAID[_assetID].assetName,
         assetDetailsByAID[_assetID].assetType,
         assetDetailsByAID[_assetID].assetSubType,
         assetDetailsByAID[_assetID].cmpnyName,
-        assetDetailsByAID[_assetID].description);
+        assetDetailsByAID[_assetID].description,
+        assetVisibility[_owner][_assetID]);
     }
 
     function getAssetTypeByAssetID(bytes32 _assetID) constant returns(bytes32){

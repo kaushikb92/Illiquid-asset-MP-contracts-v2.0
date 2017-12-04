@@ -383,8 +383,14 @@
       "links": {},
       "address": "0xda5b1c4523e243ebc1bea25dac2cb2476abdc2b2",
       "updated_at": 1511007038203
+    },
+    "1511336539951": {
+      "events": {},
+      "links": {},
+      "address": "0xdb18f89a1188e6ed029492577e592a645af1a888",
+      "updated_at": 1511336598900
     }
   },
   "schema_version": "0.0.5",
-  "updated_at": 1511008756943
+  "updated_at": 1511336598900
 }

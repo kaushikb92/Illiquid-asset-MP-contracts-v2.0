@@ -127,10 +127,40 @@ contract AssetToken is AssetRegister{
         return aquisitionPriceOfUsers[_assetID][_assetOwner];
     }
 
+    function setAcquisitonPrice(address _assetOwner,bytes32 _assetID, uint256 _newPrice) returns (bool _success){
+        aquisitionPriceOfUsers[_assetID][_assetOwner] = _newPrice;
+        return true;
+    }
+
     /* Function to get asset balance of an user by user's wallet address and asset's asset id*/
     function getAssetBalanceOfUser(address _holder, bytes32 _assetID) constant returns(uint256){
         uint256 _bal = balanceATOfUsers[_assetID][_holder];
         return _bal;
+    }
+
+    function addAssetHolders(bytes32 _assetID,address _holder) constant returns(bool success){
+        uint length = mapAssetholders[_assetID].holders.length;
+        address[] memory holderAddresses = new address[](length);
+        uint count = 0;
+        holderAddresses = mapAssetholders[_assetID].holders;
+
+        for(uint i = 0; i<length; i++){
+
+            if (holderAddresses[i] == _holder){
+                count += 1;
+            }
+        }
+
+        if (count < 1)
+        {
+            mapAssetholders[_assetID].holders.push(_holder);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+        return true;
     }
 
     /* Function to trade asset from seller to buyer */
@@ -140,9 +170,9 @@ contract AssetToken is AssetRegister{
         if (balanceATOfUsers[_assetID][_to] + _value < balanceATOfUsers[_assetID][_to]) throw; // Check for overflows
         balanceATOfUsers[_assetID][_from] -= _value;                     // Subtract from the sender
         balanceATOfUsers[_assetID][_to] += _value;
-        aquisitionPriceOfUsers[_assetID][_to] = _pricePerAsset;
+        setAcquisitonPrice(_to,_assetID,_pricePerAsset);
         assetTransfer(_from, _to, _value, _assetID);                   // Notify anyone listening that this transfer took place
-        mapAssetholders[_assetID].holders.push(_to);
+        addAssetHolders(_assetID,_to);
         AssetRegister.addAssetWithWalletAfterSell(_to,_assetID);
         return true;
     }   

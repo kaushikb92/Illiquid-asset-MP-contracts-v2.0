@@ -66,6 +66,21 @@ contract Users{
         return(UserIDsWithAddress[_user]);
     }
 
+    /* Function to chack user's login credentials */
+    function getLogin(bytes32 _userid, bytes32 _pwd) constant returns(address,bool,bool){
+        address addr = userlogin[_userid];
+        bytes32 pwd = PasswordsWithAddress[addr];
+        bool adminStatus = getAdminLogin(_userid,_pwd);
+        bool loginStatus;
+        if(pwd == _pwd){
+            loginStatus = true;
+            } else {
+                loginStatus =  false;
+            }
+            address _user = getWalletByUserID(_userid);
+            return (_user,loginStatus,adminStatus);
+    }  
+
     /* Function to query user details with associated wallet address*/
     function getUserDetailsByWallet(address _walletAddr) constant returns (bytes32, bytes32, bytes32, uint, uint){
         bytes32 _firstName = userDetails[_walletAddr].firstName;
@@ -130,14 +145,7 @@ contract Users{
     function getWalletByUserID(bytes32 _userid) constant returns(address){
         return userlogin[_userid];
     }
-
-    /* Function to chack user's login credentials */
-    function getLogin(bytes32 _userid, bytes32 _pwd) constant returns(bool){
-        address addr = userlogin[_userid];
-        bytes32 pwd = PasswordsWithAddress[addr];
-        if(pwd == _pwd){return true;} else {return false;}
-    }                                                                                                                                                                                                                                                                                                     
-
+ 
      /* Function to query UserID and account password by registered mobile number */                                                                                                                                   
     function getUserIDandPasswordbyMobNumber(uint _mobile) constant returns (bytes32, bytes32){
         address _owner = MobilesWithUserAddresses[_mobile];
